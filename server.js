@@ -19,11 +19,35 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const ConvertHandler = require('./controllers/convertHandler.js');
+let convertHandler = new ConvertHandler();
+
 //Index page (static HTML)
 app.route('/')
   .get(function (req, res) {
     res.sendFile(process.cwd() + '/views/index.html');
   });
+
+app.get('/api/convert', (req, res) => {
+  let inputNum = convertHandler.getNum(req.query.input);
+  let inputUnit = convertHandler.getUnit(req.query.input);
+  if (inputNum === 'error' && inputUnit === 'error') {
+    res.send('invalid number and unit')
+  }
+  else if (inputNum === 'error') res.send('invalid number');
+  else if (inputUnit === 'error') res.send('invalid unit');
+  else {
+    let outputNum = convertHandler.convert(inputNum, inputUnit);
+    let outputUnit = convertHandler.getReturnUnit(inputUnit);
+    res.json({
+      initNum: inputNum,
+      initUnit: inputUnit,
+      returnNum: convertHandler.convert(inputNum, inputUnit),
+      returnUnit: convertHandler.getReturnUnit(inputUnit),
+      string: convertHandler.getString(inputNum, inputUnit, outputNum, outputUnit)
+    })
+  }
+})
 
 //For FCC testing purposes
 fccTestingRoutes(app);
