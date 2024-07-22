@@ -29,13 +29,16 @@ app.route('/')
   });
 
 app.get('/api/convert', (req, res) => {
+  //Get input number and unit
   let inputNum = convertHandler.getNum(req.query.input);
   let inputUnit = convertHandler.getUnit(req.query.input);
+  //Check for errors before performing operations on them to avoid errors and return necessary error text
   if (inputNum === 'error' && inputUnit === 'error') {
     res.send('invalid number and unit')
   }
   else if (inputNum === 'error') res.send('invalid number');
   else if (inputUnit === 'error') res.send('invalid unit');
+  //If there are no errors, proceed with normal operations
   else {
     let outputNum = convertHandler.convert(inputNum, inputUnit);
     let outputUnit = convertHandler.getReturnUnit(inputUnit);
